@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/KMConner/kubectl-auth0/config"
+	"github.com/KMConner/kubectl-auth0/oauth"
 )
 
 func main() {
@@ -15,6 +16,11 @@ func main() {
 	flagSet.StringVar(&conf.OidcConfig.ClientId, "client-id", "", "Client id")
 	err := conf.LoadAndValidate()
 
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = oauth.ProcessSignIn(&conf.OidcConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
