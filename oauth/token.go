@@ -5,9 +5,11 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
+	"fmt"
 
 	"github.com/KMConner/kubectl-auth0/config"
 	"github.com/KMConner/kubectl-auth0/web"
+	"github.com/pkg/browser"
 	"golang.org/x/oauth2"
 
 	oidc "github.com/coreos/go-oidc"
@@ -35,7 +37,11 @@ func ProcessSignIn(conf *config.Oidc) error {
 	state := base64.StdEncoding.EncodeToString(b)
 
 	authUrl := cnf.AuthCodeURL(state)
-	println(authUrl)
+	fmt.Printf("Opening URL %s", authUrl)
+	err = browser.OpenURL(authUrl)
+	if err != nil {
+		fmt.Printf("failed to open browser: %+v\nPlease open manually", err)
+	}
 
 	result, err := web.WaitCallback(func(m map[string][]string) (*web.LoginResult, error) {
 		return validateLogin(provider, cnf, state, m)
