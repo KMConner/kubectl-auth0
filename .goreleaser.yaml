@@ -16,7 +16,8 @@ archives:
       386: i386
       amd64: x86_64
 brews:
-  - github:
+  - name: kubectl-auth0
+    tap:
       owner: KMConner
       name: homebrew-tap
     description: "Sign in k8s cluster using auth0"
