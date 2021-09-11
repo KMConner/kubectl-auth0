@@ -38,7 +38,7 @@ func ProcessSignIn(conf *config.Oidc) error {
 	println(authUrl)
 
 	result, err := web.WaitCallback(func(m map[string][]string) (*web.LoginResult, error) {
-		return validateLogin(cnf, state, m)
+		return validateLogin(provider, cnf, state, m)
 	})
 
 	if err != nil {
@@ -50,7 +50,7 @@ func ProcessSignIn(conf *config.Oidc) error {
 	return nil
 }
 
-func validateLogin(config *oauth2.Config, state string, query map[string][]string) (*web.LoginResult, error) {
+func validateLogin(provider *oidc.Provider, config *oauth2.Config, state string, query map[string][]string) (*web.LoginResult, error) {
 	codes, ok := query["code"]
 	if !ok || len(codes) != 1 {
 		return nil, errors.New("invalid code param")
@@ -70,8 +70,18 @@ func validateLogin(config *oauth2.Config, state string, query map[string][]strin
 		return nil, err
 	}
 
+	rawIdToken, ok := token.Extra("id_token").(string)
+	if !ok {
+		return nil, errors.New("invalid id_token")
+	}
+
+	_, err = provider.Verifier(&oidc.Config{ClientID: config.ClientID}).Verify(context.TODO(), rawIdToken)
+	if err != nil {
+		return nil, err
+	}
+
 	return &web.LoginResult{
-		Token:        token.AccessToken,
+		Token:        rawIdToken,
 		RefreshToken: token.RefreshToken,
 	}, nil
 }

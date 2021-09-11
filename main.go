@@ -25,5 +25,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	println("Hello World!")
+	err = conf.Save()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
