@@ -17,7 +17,7 @@ func TestLoadCmdArgs(t *testing.T) {
 	testCases := []struct {
 		name    string
 		args    []string
-		want    config.Config
+		want    config.CmdLine
 		wantErr bool
 	}{
 		{
@@ -30,12 +30,10 @@ func TestLoadCmdArgs(t *testing.T) {
 				"--idp-issuer-url",
 				"idp-url",
 			},
-			want: config.Config{
+			want: config.CmdLine{
 				ContextName: "name1",
-				OidcConfig: config.Oidc{
-					ClientId: "client-id",
-					IdpUrl:   "idp-url",
-				},
+				ClientId:    "client-id",
+				IdpUrl:      "idp-url",
 			},
 			wantErr: false,
 		},
@@ -45,7 +43,7 @@ func TestLoadCmdArgs(t *testing.T) {
 				"--context",
 				"name1",
 			},
-			want: config.Config{
+			want: config.CmdLine{
 				ContextName: "name1",
 			},
 			wantErr: false,
@@ -70,8 +68,7 @@ func TestLoadCmdArgs(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
-			var conf config.Config
-			err := config.LoadCmdArgs(testCase.args, devNull, &conf)
+			got, err := config.LoadCmdArgs(testCase.args, devNull)
 			if err != nil {
 				if !testCase.wantErr {
 					t.Fatalf("Undexpected err %v.", err)
@@ -81,8 +78,8 @@ func TestLoadCmdArgs(t *testing.T) {
 					t.Fatal("Error expected")
 				}
 			}
-			if testCase.want != conf {
-				t.Fatalf("Want := %v, Got := %v", testCase.want, conf)
+			if testCase.want != *got {
+				t.Fatalf("Want := %v, Got := %v", testCase.want, *got)
 			}
 		})
 	}
