@@ -1,8 +1,10 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"log"
+	"os"
 
 	"github.com/KMConner/kubectl-auth0/config"
 	"github.com/KMConner/kubectl-auth0/oauth"
@@ -10,12 +12,15 @@ import (
 
 func main() {
 	var conf config.Config
-	flagSet := flag.NewFlagSet("", flag.ContinueOnError)
-	flagSet.StringVar(&conf.ContextName, "context", "", "Specify cluster name to sign in")
-	flagSet.StringVar(&conf.OidcConfig.IdpUrl, "idp-issuer-url", "", "OIDC IDP url")
-	flagSet.StringVar(&conf.OidcConfig.ClientId, "client-id", "", "Client id")
-	err := conf.LoadAndValidate()
+	err := config.LoadCmdArgs(os.Args[1:], os.Stdout, &conf)
+	if err != nil {
+		if !errors.Is(err, flag.ErrHelp) {
+			log.Fatal(err)
+		}
+		return
+	}
 
+	err = conf.LoadAndValidate()
 	if err != nil {
 		log.Fatal(err)
 	}
