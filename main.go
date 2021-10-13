@@ -25,24 +25,20 @@ func main() {
 		log.Fatal(err)
 	}
 
-	oidcConfig, username, err := config.LoadOidcConfig(cmdline, k8sConf)
+	oidcReq, username, err := config.LoadOidcConfig(cmdline, k8sConf)
 	if err != nil {
 		log.Fatal(err)
 	}
 	if username == "" {
-		username = oidcConfig.GenerateUsername()
+		username = oidcReq.GenerateUsername()
 	}
 
-	err = oauth.ProcessSignIn(oidcConfig)
+	oidcResult, err := oauth.ProcessSignIn(oidcReq)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	conf := &config.Config{
-		UserName:   username,
-		OidcConfig: *oidcConfig,
-	}
-	err = conf.Save()
+	authInfo := oidcResult.ToAuthInfo()
+	err = k8s.SaveAuth(authInfo, username)
 	if err != nil {
 		log.Fatal(err)
 	}

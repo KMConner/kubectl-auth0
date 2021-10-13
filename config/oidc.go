@@ -1,8 +1,6 @@
 package config
 
 import (
-	"crypto/sha256"
-	"encoding/base32"
 	"errors"
 
 	"k8s.io/client-go/tools/clientcmd/api"
@@ -15,9 +13,9 @@ type Oidc struct {
 	RefreshToken string
 }
 
-func LoadOidcConfig(cmdline *CmdLine, k8sConfig *api.Config) (*Oidc, string, error) {
+func LoadOidcConfig(cmdline *CmdLine, k8sConfig *api.Config) (*OidcRequest, string, error) {
 	if cmdline.ClientId != "" && cmdline.IdpUrl != "" {
-		return &Oidc{
+		return &OidcRequest{
 			ClientId: cmdline.ClientId,
 			IdpUrl:   cmdline.IdpUrl,
 		}, "", nil
@@ -44,7 +42,7 @@ func LoadOidcConfig(cmdline *CmdLine, k8sConfig *api.Config) (*Oidc, string, err
 		return nil, "", errors.New("user " + ctx.AuthInfo + " was found but auth provider is not oidc")
 	}
 
-	oidcConf, err := parseOidcConfig(user.AuthProvider.Config)
+	oidcConf, err := newOidcRequest(user.AuthProvider.Config)
 
 	if err != nil {
 		return nil, "", err
@@ -53,35 +51,16 @@ func LoadOidcConfig(cmdline *CmdLine, k8sConfig *api.Config) (*Oidc, string, err
 	return oidcConf, ctx.AuthInfo, nil
 }
 
-func parseOidcConfig(configs map[string]string) (*Oidc, error) {
-	var conf Oidc
-	clientId, ok := configs["client-id"]
-	if !ok {
-		return nil, errors.New("key open-id not found")
+func (o *Oidc) ToAuthInfo() *api.AuthInfo {
+	return &api.AuthInfo{
+		AuthProvider: &api.AuthProviderConfig{
+			Name: "oidc",
+			Config: map[string]string{
+				"idp-issuer-url": o.IdpUrl,
+				"client-id":      o.ClientId,
+				"id-token":       o.Token,
+				"refresh-token":  o.RefreshToken,
+			},
+		},
 	}
-	conf.ClientId = clientId
-
-	token, ok := configs["id-token"]
-	if ok {
-		conf.Token = token
-	}
-
-	idpUrl, ok := configs["idp-issuer-url"]
-	if !ok {
-		return nil, errors.New("key idp-issuer-url not found")
-	}
-	conf.IdpUrl = idpUrl
-
-	refreshToken, ok := configs["refresh-token"]
-	if ok {
-		conf.RefreshToken = refreshToken
-	}
-
-	return &conf, nil
-}
-
-func (o *Oidc) GenerateUsername() string {
-	sha := sha256.New()
-	hashed := sha.Sum([]byte(o.IdpUrl + o.ClientId))
-	return "auth0-" + base32.HexEncoding.EncodeToString(hashed)
 }

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/KMConner/kubectl-auth0/config"
+	"github.com/google/go-cmp/cmp"
 	"k8s.io/client-go/tools/clientcmd/api"
 )
 
@@ -14,7 +15,7 @@ func TestLoadOidcConfig(t *testing.T) {
 		name      string
 		k8sConfig api.Config
 		cmdArgs   config.CmdLine
-		want      config.Oidc
+		want      config.OidcRequest
 		wantName  string
 		wantErr   bool
 	}{
@@ -24,7 +25,7 @@ func TestLoadOidcConfig(t *testing.T) {
 				IdpUrl:   "https://example.com/",
 				ClientId: "client-1234",
 			},
-			want: config.Oidc{
+			want: config.OidcRequest{
 				ClientId: "client-1234",
 				IdpUrl:   "https://example.com/",
 			},
@@ -36,7 +37,7 @@ func TestLoadOidcConfig(t *testing.T) {
 			cmdArgs: config.CmdLine{
 				ContextName: "ctx1",
 			},
-			want: config.Oidc{
+			want: config.OidcRequest{
 				ClientId: "client-1234",
 				IdpUrl:   "https://example.com/",
 			},
@@ -63,7 +64,7 @@ func TestLoadOidcConfig(t *testing.T) {
 		},
 		{
 			name: "Use default context",
-			want: config.Oidc{
+			want: config.OidcRequest{
 				ClientId: "client-1234",
 				IdpUrl:   "https://example.com/",
 			},
@@ -232,4 +233,32 @@ func TestLoadOidcConfig(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestToAuthInfo(t *testing.T) {
+	t.Run("Convert into auth info", func(t *testing.T) {
+		t.Parallel()
+		want := api.AuthInfo{
+			AuthProvider: &api.AuthProviderConfig{
+				Name: "oidc",
+				Config: map[string]string{
+					"client-id":      "client-1234",
+					"id-token":       "token-1234",
+					"idp-issuer-url": "url-1234",
+					"refresh-token":  "refresh-1234",
+				},
+			},
+		}
+
+		oidcConfig := &config.Oidc{
+			ClientId:     "client-1234",
+			Token:        "token-1234",
+			IdpUrl:       "url-1234",
+			RefreshToken: "refresh-1234",
+		}
+		got := oidcConfig.ToAuthInfo()
+		if !cmp.Equal(want, *got) {
+			t.Fatalf("got := %v, want := %v", *got, want)
+		}
+	})
 }
