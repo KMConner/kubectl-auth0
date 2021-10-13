@@ -24,7 +24,7 @@ jobs:
       - name: Get deps
         run: go mod download -x
       - name: Build
-        run: go build . -v
+        run: go build -v .
 
   test:
     name: Test
