@@ -4,8 +4,9 @@ go 1.17
 
 require (
 	github.com/coreos/go-oidc v2.2.1+incompatible
+	github.com/pkg/browser v0.0.0-20210904010418-6d279e18f982
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
-	k8s.io/client-go v0.22.1
+	k8s.io/client-go v0.22.2
 )
 
 require (
@@ -19,7 +20,6 @@ require (
 	github.com/json-iterator/go v1.1.11 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
-	github.com/pkg/browser v0.0.0-20210904010418-6d279e18f982 // indirect
 	github.com/pquerna/cachecontrol v0.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83 // indirect
@@ -33,9 +33,9 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	k8s.io/apimachinery v0.22.1 // indirect
+	k8s.io/apimachinery v0.22.2 // indirect
 	k8s.io/klog/v2 v2.9.0 // indirect
-	k8s.io/utils v0.0.0-20210707171843-4b05e18ac7d9 // indirect
+	k8s.io/utils v0.0.0-20210819203725-bdf08cb9a70a // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.1.2 // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
