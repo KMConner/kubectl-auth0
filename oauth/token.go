@@ -37,10 +37,10 @@ func ProcessSignIn(oidcReq *config.OidcRequest) (*config.Oidc, error) {
 	state := base64.StdEncoding.EncodeToString(b)
 
 	authUrl := cnf.AuthCodeURL(state)
-	fmt.Printf("Opening URL %s", authUrl)
+	fmt.Printf("Opening URL %s\n", authUrl)
 	err = browser.OpenURL(authUrl)
 	if err != nil {
-		fmt.Printf("failed to open browser: %+v\nPlease open manually", err)
+		fmt.Printf("failed to open browser: %+v\nPlease open manually\n", err)
 	}
 
 	result, err := web.WaitCallback(func(m map[string][]string) (*web.LoginResult, error) {

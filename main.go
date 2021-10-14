@@ -42,4 +42,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Printf("Auth info %s saved", username)
 }
