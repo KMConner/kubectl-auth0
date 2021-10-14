@@ -12,18 +12,18 @@ import (
 	"github.com/pkg/browser"
 	"golang.org/x/oauth2"
 
-	oidc "github.com/coreos/go-oidc"
+	"github.com/coreos/go-oidc"
 )
 
-func ProcessSignIn(conf *config.Oidc) error {
+func ProcessSignIn(oidcReq *config.OidcRequest) (*config.Oidc, error) {
 	ctx := context.Background()
-	provider, err := oidc.NewProvider(ctx, conf.IdpUrl)
+	provider, err := oidc.NewProvider(ctx, oidcReq.IdpUrl)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	cnf := &oauth2.Config{
-		ClientID:    conf.ClientId,
+		ClientID:    oidcReq.ClientId,
 		Endpoint:    provider.Endpoint(),
 		RedirectURL: "http://localhost:8088/callback",
 		Scopes:      []string{oidc.ScopeOpenID, oidc.ScopeOfflineAccess, "profile", "email"},
@@ -32,15 +32,15 @@ func ProcessSignIn(conf *config.Oidc) error {
 	b := make([]byte, 32)
 	_, err = rand.Read(b)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	state := base64.StdEncoding.EncodeToString(b)
 
 	authUrl := cnf.AuthCodeURL(state)
-	fmt.Printf("Opening URL %s", authUrl)
+	fmt.Printf("Opening URL %s\n", authUrl)
 	err = browser.OpenURL(authUrl)
 	if err != nil {
-		fmt.Printf("failed to open browser: %+v\nPlease open manually", err)
+		fmt.Printf("failed to open browser: %+v\nPlease open manually\n", err)
 	}
 
 	result, err := web.WaitCallback(func(m map[string][]string) (*web.LoginResult, error) {
@@ -48,12 +48,15 @@ func ProcessSignIn(conf *config.Oidc) error {
 	})
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	conf.Token = result.Token
-	conf.RefreshToken = result.RefreshToken
-	return nil
+	return &config.Oidc{
+		ClientId:     oidcReq.ClientId,
+		Token:        result.Token,
+		IdpUrl:       oidcReq.IdpUrl,
+		RefreshToken: result.RefreshToken,
+	}, nil
 }
 
 func validateLogin(provider *oidc.Provider, config *oauth2.Config, state string, query map[string][]string) (*web.LoginResult, error) {
