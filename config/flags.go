@@ -12,6 +12,7 @@ func LoadCmdArgs(args []string, console io.Writer) (*CmdLine, error) {
 	flagSet.StringVar(&conf.ContextName, "context", "", "Specify cluster name to sign in")
 	flagSet.StringVar(&conf.IdpUrl, "idp-issuer-url", "", "OIDC IDP url")
 	flagSet.StringVar(&conf.ClientId, "client-id", "", "Client id")
+	flagSet.StringVar(&conf.NewUsername, "new-username", "", "Username to save")
 	err := flagSet.Parse(args)
 	return &conf, err
 }

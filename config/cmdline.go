@@ -4,4 +4,5 @@ type CmdLine struct {
 	ContextName string
 	IdpUrl      string
 	ClientId    string
+	NewUsername string
 }

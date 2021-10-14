@@ -18,7 +18,7 @@ func LoadOidcConfig(cmdline *CmdLine, k8sConfig *api.Config) (*OidcRequest, stri
 		return &OidcRequest{
 			ClientId: cmdline.ClientId,
 			IdpUrl:   cmdline.IdpUrl,
-		}, "", nil
+		}, cmdline.NewUsername, nil
 	}
 
 	contextName := cmdline.ContextName
@@ -47,8 +47,12 @@ func LoadOidcConfig(cmdline *CmdLine, k8sConfig *api.Config) (*OidcRequest, stri
 	if err != nil {
 		return nil, "", err
 	}
+	newUsername := cmdline.NewUsername
+	if newUsername == "" {
+		newUsername = ctx.AuthInfo
+	}
 
-	return oidcConf, ctx.AuthInfo, nil
+	return oidcConf, newUsername, nil
 }
 
 func (o *Oidc) ToAuthInfo() *api.AuthInfo {
