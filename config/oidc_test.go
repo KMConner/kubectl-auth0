@@ -20,16 +20,17 @@ func TestLoadOidcConfig(t *testing.T) {
 		wantErr   bool
 	}{
 		{
-			name: "All from command line",
+			name: "Idp url, client id and new username is specified in the command line arguments",
 			cmdArgs: config.CmdLine{
 				IdpUrl:   "https://example.com/",
 				ClientId: "client-1234",
+				NewUsername: "new-user1",
 			},
 			want: config.OidcRequest{
 				ClientId: "client-1234",
 				IdpUrl:   "https://example.com/",
 			},
-			wantName: "",
+			wantName: "new-user1",
 			wantErr:  false,
 		},
 		{
@@ -62,6 +63,38 @@ func TestLoadOidcConfig(t *testing.T) {
 			wantName: "user1",
 			wantErr:  false,
 		},
+		{
+			name: "Context specified with new username",
+			cmdArgs: config.CmdLine{
+				ContextName: "ctx1",
+				NewUsername: "new-user1",
+			},
+			want: config.OidcRequest{
+				ClientId: "client-1234",
+				IdpUrl:   "https://example.com/",
+			},
+			k8sConfig: api.Config{
+				AuthInfos: map[string]*api.AuthInfo{
+					"user1": {
+						AuthProvider: &api.AuthProviderConfig{
+							Name: "oidc",
+							Config: map[string]string{
+								"client-id":      "client-1234",
+								"idp-issuer-url": "https://example.com/",
+							},
+						},
+					},
+				},
+				Contexts: map[string]*api.Context{
+					"ctx1": {
+						AuthInfo: "user1",
+					},
+				},
+			},
+			wantName: "new-user1",
+			wantErr:  false,
+		},
+
 		{
 			name: "Use default context",
 			want: config.OidcRequest{
