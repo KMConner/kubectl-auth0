@@ -30,5 +30,5 @@ func newOidcRequest(params map[string]string) (*OidcRequest, error) {
 func (o *OidcRequest) GenerateUsername() string {
 	sha := sha256.New()
 	hashed := sha.Sum([]byte(o.IdpUrl + o.ClientId))
-	return "auth0-" + base32.HexEncoding.EncodeToString(hashed)
+	return "auth0-" + base32.HexEncoding.EncodeToString(hashed)[:5]
 }
