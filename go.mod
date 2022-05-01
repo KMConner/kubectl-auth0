@@ -7,7 +7,7 @@ require (
 	github.com/google/go-cmp v0.5.7
 	github.com/pkg/browser v0.0.0-20210904010418-6d279e18f982
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
-	k8s.io/client-go v0.23.4
+	k8s.io/client-go v0.23.6
 )
 
 require (
@@ -33,7 +33,7 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	k8s.io/apimachinery v0.23.4 // indirect
+	k8s.io/apimachinery v0.23.6 // indirect
 	k8s.io/klog/v2 v2.30.0 // indirect
 	k8s.io/utils v0.0.0-20211116205334-6203023598ed // indirect
 	sigs.k8s.io/json v0.0.0-20211020170558-c049b76a60c6 // indirect
