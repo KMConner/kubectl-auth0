@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/coreos/go-oidc v2.2.1+incompatible
-	github.com/google/go-cmp v0.5.8
+	github.com/google/go-cmp v0.5.9
 	github.com/pkg/browser v0.0.0-20210904010418-6d279e18f982
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	k8s.io/client-go v0.24.3
